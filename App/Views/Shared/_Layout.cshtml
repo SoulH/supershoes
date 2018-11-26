@@ -1,0 +1,78 @@
+﻿@using System.Configuration;
+@using Models;
+@{ 
+    var usr = (UserModel)ViewBag.User ?? new UserModel();
+    var sel = (string)ViewBag.Controller ?? "";
+    var lnks = new List<string>() { "Home", "About", "Stores", "Articles" };
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @Styles.Render("~/Content/bootstrap.css")
+    @Styles.Render("~/Content/Site.css")
+    @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("Styles",required: false)
+</head>
+<body api_url = "@ConfigurationManager.AppSettings["API_URL"]">
+    <div class="grid">
+        <div class="logo">
+            <img src="~/Content/img/logo.png" />
+        </div>
+        <div class="title">
+            <img src="~/Content/img/title.png" />
+        </div>
+        <div class="header">
+            <div class="left">
+                <button id="menu-toggle" class="btn btn-sw"><i class="material-icons">menu</i></button>
+                @Html.ActionLink(lnks[0], "Index", lnks[0], new { area = "" }, new { @class = "navbar-item" +((lnks[0] == sel)? " select" : "") })
+                @Html.ActionLink(lnks[1], "Index", lnks[1], new { area = "" }, new { @class = "navbar-item" + ((lnks[1] == sel) ? " select" : "") })
+
+            </div>
+            <div class="right">
+                <img src="~/Content/img/user.svg" height="40" width="auto" />
+                <a id="admin-name" class="navbar-item-nav" href="#">@usr.Username ▼</a>
+            </div>
+        </div>
+        <div class="icons">
+            @Html.ActionLink(" ", "Index", lnks[0], new { area = "" }, new { @class = "aside-item" + ((lnks[0] == sel) ? " select" : ""), @id = "img-home" })
+            @Html.ActionLink(" ", "Index", lnks[1], new { area = "" }, new { @class = "aside-item" + ((lnks[1] == sel) ? " select" : ""), @id = "img-about" })
+            @Html.ActionLink(" ", "Index", lnks[2], new { area = "" }, new { @class = "aside-item" + ((lnks[2] == sel) ? " select" : ""), @id = "img-store" })
+            @Html.ActionLink(" ", "Index", lnks[3], new { area = "" }, new { @class = "aside-item" + ((lnks[3] == sel) ? " select" : ""), @id = "img-article" })
+        </div>
+        <div class="menu">
+            @Html.ActionLink(lnks[0], "Index", lnks[0], new { area = "" }, new { @class = "aside-item" + ((lnks[0] == sel) ? " select" : ""), @id = "link-home" })
+            @Html.ActionLink(lnks[1], "Index", lnks[1], new { area = "" }, new { @class = "aside-item" + ((lnks[1] == sel) ? " select" : ""), @id = "link-about" })
+            @Html.ActionLink(lnks[2], "Index", lnks[2], new { area = "" }, new { @class = "aside-item" + ((lnks[2] == sel) ? " select" : ""), @id = "link-store" })
+            @Html.ActionLink(lnks[3], "Index", lnks[3], new { area = "" }, new { @class = "aside-item" + ((lnks[3] == sel) ? " select" : ""), @id = "link-article" })
+        </div>
+        <div class="main">
+            @RenderBody()
+            @RenderSection("SPAViews", required: false)
+        </div>
+    </div>
+
+    <ul class="user-menu">
+        @if (!usr.IsAuthenticated)
+        {
+        <li><i class="material-icons">person</i> @Html.ActionLink("Login", "Login", "Account", new { area = "" }, null)</li>
+        <li><i class="material-icons">person_add</i> @Html.ActionLink("Register", "Register", "Account", new { area = "" }, null)</li>
+        }
+        else
+        {
+        <li><i class="material-icons">person</i> @Html.ActionLink("Logout", "LogOut", "Account", new { area = "" }, new { @id = "log-out" })</li>
+        <li><i class="material-icons">settings</i> @Html.ActionLink("Settings", "Index", "Home", new { area = "" }, null)</li>
+        }
+    </ul>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/Scripts/bootstrap.min.js")
+    @Scripts.Render("~/Scripts/site.js")
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

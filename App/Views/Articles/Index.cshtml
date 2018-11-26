@@ -1,0 +1,129 @@
+﻿@using Models
+@model IEnumerable<Models.ArticleModel>
+
+@{
+    var stores = (List<StoreModel>)ViewBag.Stores ?? new List<StoreModel>();
+    var isUserAuthenticated = ((UserModel)ViewBag.User).IsAuthenticated;
+    var gridTemplateColumn = (isUserAuthenticated) ? "auto 50px 300px 50px 50px" : "auto 50px 300px 50px";
+    var strSearch = (string)ViewBag.StrSearch;
+    var storeId = (int)ViewBag.StoreId;
+}
+
+@section styles {
+<style>
+        .main{
+            display: grid;
+            grid-template-rows: 50px auto;
+        }
+
+        .search {
+            display: grid;
+            background-color: #556080;
+            grid-template-columns: @gridTemplateColumn;
+            flex-direction: row;
+            grid-gap: 10px;
+            align-content: center;
+            padding-right: 7px;
+        }
+
+            .search > label {
+                color : white;
+                padding: 10px;
+            }
+
+            .search > input {
+                height: 30px;
+                margin: 7px;
+            }
+
+            .search > select {
+                height: 30px;
+                margin: 7px;
+            }
+</style>
+}
+
+<div class="search">
+    <input id="search-in" type="text" placeholder="type article name here..." value="@strSearch"/>
+    <label><b>Store:</b></label>
+    <select id="store-id-sel">
+        <option value="0">All</option>
+        @foreach (var x in stores)
+        {
+            if (x.Id == storeId)
+            {
+                <option value="@x.Id" selected>@x.Name</option>
+            }
+            else
+            {
+                <option value="@x.Id">@x.Name</option>
+            }
+        }
+    </select>
+    <button id="btn-search" class="btn btn-success" onclick="articleSearch()"><b><i class="material-icons">search</i></b></button>
+    @if (isUserAuthenticated)
+    {
+        <a class="btn btn-warning" href="@Url.Action("Create", "Articles")"><b><i class="material-icons">add_box</i></b></a>
+    }
+</div>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TotalInShelf)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TotalInVault)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StoreName)
+        </th>
+        <th>
+            Actions
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalInShelf)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalInVault)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StoreName)
+            </td>
+            <td>
+                @if (isUserAuthenticated)
+                {
+                <p>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @*Html.ActionLink("Details", "Details", new { id = item.Id }) |*@
+                <a href="#" onclick="deleteArticle(@item.Id)">Delete</a>
+                </p>
+                }
+            </td>
+        </tr>
+    }
+
+</table>
