@@ -46,11 +46,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArticleModel.cs" />
+    <Compile Include="ArticleResponseModel.cs" />
+    <Compile Include="ArticlesResponseModel.cs" />
     <Compile Include="Model.cs" />
+    <Compile Include="ResponseModelBase.cs" />
     <Compile Include="StoreModel.cs" />
     <Compile Include="ErrorResponseModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseModel.cs" />
+    <Compile Include="StoreResponseModel.cs" />
+    <Compile Include="StoresResponseModel.cs" />
     <Compile Include="TokenModel.cs" />
     <Compile Include="UserModel.cs" />
   </ItemGroup>

@@ -3,12 +3,14 @@ using System.Web.Http;
 using System.Web.Mvc;
 using Api.Areas.HelpPage.ModelDescriptions;
 using Api.Areas.HelpPage.Models;
+using Api.Security;
 
 namespace Api.Areas.HelpPage.Controllers
 {
     /// <summary>
     /// The controller that will handle requests for the help page.
     /// </summary>
+    [BasicAuthentication]
     public class HelpController : Controller
     {
         private const string ErrorViewName = "Error";

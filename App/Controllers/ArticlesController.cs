@@ -10,8 +10,6 @@ namespace App.Controllers
 {
     public class ArticlesController : Controller
     {
-        readonly HttpClient client = new HttpClient();
-
         // GET: Articles
         public async Task<ActionResult> Index(Listing listing)
         {
@@ -20,20 +18,20 @@ namespace App.Controllers
             ViewBag.StrSearch = listing.Name;
             ViewBag.StoreId = 0;
             var url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], "stores");
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await DefaultApiClient.Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsAsync<ResponseModel<StoreModel>>();
+                var content = await response.Content.ReadAsAsync<StoresResponseModel>();
                 if (content.Success)
-                    ViewBag.Stores = content.Data;
+                    ViewBag.Stores = content.Stores;
             }
             url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], $"articles?take={listing.Take}&skip={listing.Skip}" + (string.IsNullOrEmpty(listing.Name) ? "" : $"&name={listing.Name}"));
-            response = await client.GetAsync(url);
+            response = await DefaultApiClient.Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsAsync<ResponseModel<ArticleModel>>();
+                var content = await response.Content.ReadAsAsync<ArticlesResponseModel>();
                 if (content.Success)
-                    return View(content.Data);
+                    return View(content.Articles);
             }
             return RedirectToAction("Index", "Home", null);
         }
@@ -46,20 +44,20 @@ namespace App.Controllers
             ViewBag.StrSearch = listing.Name;
             ViewBag.StoreId = listing.StoreId;
             var url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], "stores");
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await DefaultApiClient.Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsAsync<ResponseModel<StoreModel>>();
+                var content = await response.Content.ReadAsAsync<StoresResponseModel>();
                 if (content.Success)
-                    ViewBag.Stores = content.Data;
+                    ViewBag.Stores = content.Stores;
             }
             url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], $"articles/store/{listing.StoreId}?take={listing.Take}&skip={listing.Skip}" + (string.IsNullOrEmpty(listing.Name) ? "" : $"&name={listing.Name}"));
-            response = await client.GetAsync(url);
+            response = await DefaultApiClient.Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsAsync<ResponseModel<ArticleModel>>();
+                var content = await response.Content.ReadAsAsync<ArticlesResponseModel>();
                 if (content.Success)
-                    return View("Index",content.Data);
+                    return View("Index",content.Articles);
             }
             return RedirectToAction("Index", "Home", null);
         }
@@ -78,30 +76,47 @@ namespace App.Controllers
             ViewBag.User = this.GetUser(User.Identity);
             ViewBag.Controller = this.GetName();
             var url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], $"stores?take=0&skip=0");
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await DefaultApiClient.Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsAsync<ResponseModel<StoreModel>>();
+                var content = await response.Content.ReadAsAsync<StoresResponseModel>();
                 if (content.Success)
-                    ViewBag.Stores = content.Data;
+                    ViewBag.Stores = content.Stores;
             }
             return View();
         }
 
         // POST: Articles/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public async Task<ActionResult> Create(FormCollection collection)
         {
             try
             {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
+                ViewBag.User = this.GetUser(User.Identity);
+                ViewBag.Controller = this.GetName();
+                var model = new ArticleModel()
+                {
+                    StoreId = int.Parse(collection.Get("StoreId")),
+                    Name = collection.Get("Name"),
+                    Description = collection.Get("Description"),
+                    Price = decimal.Parse(collection.Get("Price")),
+                    TotalInShelf = int.Parse(collection.Get("TotalInShelf")),
+                    TotalInVault = int.Parse(collection.Get("TotalInVault"))
+                };
+                var url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], $"articles");
+                HttpResponseMessage response = await DefaultApiClient.Client.PostAsJsonAsync(url,model);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsAsync<ResponseModelBase>();
+                    if (!content.Success)
+                        return View();
+                }
             }
             catch
             {
                 return View();
             }
+            return RedirectToAction("Index");
         }
 
         // GET: Articles/Edit/5
@@ -110,54 +125,78 @@ namespace App.Controllers
             ViewBag.User = this.GetUser(User.Identity);
             ViewBag.Controller = this.GetName();
             var url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], $"articles/{id}");
-            HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await DefaultApiClient.Client.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadAsAsync<ResponseModel<ArticleModel>>();
+                var content = await response.Content.ReadAsAsync<ArticleResponseModel>();
                 if (content.Success)
-                    return View(content.Data[0]);
+                    return View(content.Article);
             }
             return View();
         }
 
         // POST: Articles/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public async Task<ActionResult> Edit(int id, FormCollection collection)
         {
             try
             {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                ViewBag.User = this.GetUser(User.Identity);
+                ViewBag.Controller = this.GetName();
+                var model = new ArticleModel()
+                {
+                    Id = int.Parse(collection.Get("Id")),
+                    StoreId = int.Parse(collection.Get("StoreId")),
+                    Name = collection.Get("Name"),
+                    Description = collection.Get("Description"),
+                    Price = decimal.Parse(collection.Get("Price")),
+                    TotalInShelf = int.Parse(collection.Get("TotalInShelf")),
+                    TotalInVault = int.Parse(collection.Get("TotalInVault"))
+                };
+                var url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], $"articles/{id}");
+                HttpResponseMessage response = await DefaultApiClient.Client.PutAsJsonAsync(url, model);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsAsync<ResponseModelBase>();
+                    if (!content.Success)
+                        return View();
+                }
             }
             catch
             {
                 return View();
             }
+            return RedirectToAction("Index");
         }
 
         // GET: Articles/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            ViewBag.User = this.GetUser(User.Identity);
-            ViewBag.Controller = this.GetName();
-            return View();
+            try
+            {
+                ViewBag.User = this.GetUser(User.Identity);
+                ViewBag.Controller = this.GetName();
+                var url = string.Join("/", ConfigurationManager.AppSettings["API_URL"], $"articles/{id}");
+                HttpResponseMessage response = await DefaultApiClient.Client.DeleteAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsAsync<ResponseModelBase>();
+                    if (!content.Success)
+                        return View();
+                }
+            }
+            catch
+            {
+                return View();
+            }
+            return RedirectToAction("Index");
         }
 
         // POST: Articles/Delete/5
         [HttpPost]
         public ActionResult Delete(int id, FormCollection collection)
         {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+            return RedirectToAction("Index");
         }
     }
 }

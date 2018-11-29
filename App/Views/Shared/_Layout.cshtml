@@ -34,21 +34,27 @@
 
             </div>
             <div class="right">
-                <img src="~/Content/img/user.svg" height="40" width="auto" />
+                <img src="~/Content/img/user.svg" height="40" />
                 <a id="admin-name" class="navbar-item-nav" href="#">@usr.Username ▼</a>
             </div>
         </div>
         <div class="icons">
             @Html.ActionLink(" ", "Index", lnks[0], new { area = "" }, new { @class = "aside-item" + ((lnks[0] == sel) ? " select" : ""), @id = "img-home" })
             @Html.ActionLink(" ", "Index", lnks[1], new { area = "" }, new { @class = "aside-item" + ((lnks[1] == sel) ? " select" : ""), @id = "img-about" })
+            @if (usr.IsAuthenticated)
+            {
             @Html.ActionLink(" ", "Index", lnks[2], new { area = "" }, new { @class = "aside-item" + ((lnks[2] == sel) ? " select" : ""), @id = "img-store" })
             @Html.ActionLink(" ", "Index", lnks[3], new { area = "" }, new { @class = "aside-item" + ((lnks[3] == sel) ? " select" : ""), @id = "img-article" })
+            }
         </div>
         <div class="menu">
             @Html.ActionLink(lnks[0], "Index", lnks[0], new { area = "" }, new { @class = "aside-item" + ((lnks[0] == sel) ? " select" : ""), @id = "link-home" })
             @Html.ActionLink(lnks[1], "Index", lnks[1], new { area = "" }, new { @class = "aside-item" + ((lnks[1] == sel) ? " select" : ""), @id = "link-about" })
+            @if (usr.IsAuthenticated)
+            {
             @Html.ActionLink(lnks[2], "Index", lnks[2], new { area = "" }, new { @class = "aside-item" + ((lnks[2] == sel) ? " select" : ""), @id = "link-store" })
             @Html.ActionLink(lnks[3], "Index", lnks[3], new { area = "" }, new { @class = "aside-item" + ((lnks[3] == sel) ? " select" : ""), @id = "link-article" })
+            }
         </div>
         <div class="main">
             @RenderBody()

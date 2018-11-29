@@ -11,13 +11,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using Api.Security;
 
 namespace Api.Controllers
 {
     /// <summary>
     /// login controller class for authenticate users
     /// </summary>
-    [Authorize]
+    [BasicHttpAuthentication]
     [RoutePrefix("Services/Account")]
     public class AccountController : ApiController
     {
@@ -51,7 +52,7 @@ namespace Api.Controllers
         private IAuthenticationManager AuthenticationManager => Request.GetOwinContext().Authentication;
 
         [HttpPost]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("Authenticate")]
         public async Task<IHttpActionResult> Authenticate(UserModel model)
         {
@@ -71,7 +72,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [Route("Register")]
         public async Task<IHttpActionResult> Register(UserModel model)
         {

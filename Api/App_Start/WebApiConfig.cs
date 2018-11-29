@@ -25,7 +25,7 @@ namespace Api
             // Cors
             config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
 
-            config.MessageHandlers.Add(new TokenValidationHandler());
+            //config.MessageHandlers.Add(new TokenValidationHandler());
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",

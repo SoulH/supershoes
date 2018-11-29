@@ -18,81 +18,63 @@ namespace Core.Services
             _repository = repository;
         }
 
-        public ResponseModel<ArticleModel> Delete(int id)
+        public void Delete(int id)
         {
-            return this.SecureExcecution<ArticleModel>(() =>
-            {
-                if (id < 1) throw new BadRequestException();
-                var obj = _repository.GetById<Article>(id);
-                if (obj == null) throw new NotFoundException();
-                _repository.Delete(obj);
-                _repository.SaveChages<Article>();
-            });
+            if (id < 1) throw new BadRequestException();
+            var obj = _repository.GetById<Article>(id);
+            if (obj == null) throw new NotFoundException();
+            _repository.Delete(obj);
+            _repository.SaveChages<Article>();
         }
 
-        public ResponseModel<ArticleModel> FindById(int id)
+        public ArticleModel FindById(int id)
         {
-            return this.SecureExcecution<ArticleModel,ArticleModel>(() =>
-            {
-                if (id < 1) throw new BadRequestException();
-                var obj = _repository.GetById<Article>(id);
-                if (obj == null) throw new NotFoundException();
-                return obj.ToModel();
-            });
+            if (id < 1) throw new BadRequestException();
+            var obj = _repository.GetById<Article>(id);
+            if (obj == null) throw new NotFoundException();
+            return obj.ToModel();
         }
 
-        public ResponseModel<ArticleModel> Insert(ArticleModel model)
+        public void Insert(ArticleModel model)
         {
-            return this.SecureExcecution<ArticleModel>(() => 
-            {
-                if (model == null) throw new BadRequestException();
-                if (model.Id > 0) throw new BadRequestException();
-                var obj = model.ToEntity();
-                if (!obj.IsValid()) throw new BadRequestException();
-                _repository.Add(obj);
-                _repository.SaveChages<Article>();
-            });
+            if (model == null) throw new BadRequestException();
+            if (model.Id > 0) throw new BadRequestException();
+            var obj = model.ToEntity();
+            if (!obj.IsValid()) throw new BadRequestException();
+            _repository.Add(obj);
+            _repository.SaveChages<Article>();
         }
 
-        public ResponseModel<ArticleModel> List(int take = 0, int skip = 0, string name = "")
+        public List<ArticleModel> List(int take = 0, int skip = 0, string name = "")
         {
-            return this.SecureExcecution<ArticleModel,List<ArticleModel>>(() =>
-            {
-                return _repository.List(new GenericSpec<Article>(f => f.Name.Contains(name)), take, skip)
+            return _repository.List(new GenericSpec<Article>(f => f.Name.Contains(name)), take, skip)
                         .Select(f => f.ToModel()).ToList();
-            });
         }
 
-        public ResponseModel<ArticleModel> ListByStore(int storeid, int take = 0, int skip = 0, string name = "")
+        public List<ArticleModel> ListByStore(int storeid, int take = 0, int skip = 0, string name = "")
         {
-            return this.SecureExcecution<ArticleModel,List<ArticleModel>>(() =>
-            {
-                if (storeid < 1) throw new BadRequestException();
-                var store = _repository.GetById<Store>(storeid);
-                if (store == null) throw new NotFoundException();
-                var list = _repository.List(new GenericSpec<Article>(f => (f.StoreId == storeid) && f.Name.Contains(name)), take, skip);
-                return list.Select(f => f.ToModel()).ToList();
-            });
+            if (storeid < 1) throw new BadRequestException();
+            var store = _repository.GetById<Store>(storeid);
+            if (store == null) throw new NotFoundException();
+            var list = _repository.List(new GenericSpec<Article>(f => (f.StoreId == storeid) && f.Name.Contains(name)), take, skip);
+            return list.Select(f => f.ToModel()).ToList();
         }
 
-        public ResponseModel<ArticleModel> Update(ArticleModel model)
+        public void Update(ArticleModel model)
         {
-            return this.SecureExcecution<ArticleModel>(() =>
-            {
-                if (model == null) throw new BadRequestException();
-                if (model.Id < 1) throw new BadRequestException();
-                var obj = _repository.GetById<Article>(model.Id);
-                if (obj == null) throw new NotFoundException();
-                obj.Name = model.Name;
-                obj.Description = model.Description;
-                obj.Price = model.Price;
-                obj.TotalInShelf = model.TotalInShelf;
-                obj.TotalInVault = model.TotalInVault;
-                obj.StoreId = model.StoreId;
-                if (!obj.IsValid()) throw new BadRequestException();
-                _repository.Update(obj);
-                _repository.SaveChages<Article>();
-            });
+            if (model == null) throw new BadRequestException();
+            if (model.Id < 1) throw new BadRequestException();
+            var obj = _repository.GetById<Article>(model.Id);
+            if (obj == null) throw new NotFoundException();
+            obj.Name = model.Name;
+            obj.Description = model.Description;
+            obj.Price = model.Price;
+            obj.TotalInShelf = model.TotalInShelf;
+            obj.TotalInVault = model.TotalInVault;
+            obj.StoreId = model.StoreId;
+            if (!obj.IsValid()) throw new BadRequestException();
+            _repository.Update(obj);
+            _repository.SaveChages<Article>();
         }
     }
 }

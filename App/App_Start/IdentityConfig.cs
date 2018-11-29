@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.Configuration;
 using Models;
 using System.Net.Http.Headers;
+using App.Utils;
 
 namespace App
 {
@@ -39,8 +40,6 @@ namespace App
     // Configure the application user manager which is used in this application.
     public class ApplicationUserManager : UserManager<ApplicationUser>
     {
-        static HttpClient client = new HttpClient();
-
         public ApplicationUserManager(IUserStore<ApplicationUser> store)
             : base(store)
         {
@@ -103,7 +102,7 @@ namespace App
                 Password = password,
                 ConfirmPassword = password
             };
-            HttpResponseMessage response = await client.PostAsJsonAsync(url, usr);
+            HttpResponseMessage response = await DefaultApiClient.Client.PostAsJsonAsync(url, usr);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsAsync<ResponseModel<UserModel>>();
@@ -132,13 +131,11 @@ namespace App
             return new ApplicationSignInManager(context.GetUserManager<ApplicationUserManager>(), context.Authentication);
         }
 
-        static HttpClient client = new HttpClient();
-
         public override async Task<SignInStatus> PasswordSignInAsync(string userName, string password, bool isPersistent, bool shouldLockout)
         {
-            var url = string.Join("/",ConfigurationManager.AppSettings["API_URL"], "account", "auth");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", password);
-            HttpResponseMessage response = await client.GetAsync(url);
+            var url = string.Join("/",ConfigurationManager.AppSettings["API_URL"], "account", "authenticate");
+            var usr = new UserModel() { Username = userName, Password = password };
+            HttpResponseMessage response = await DefaultApiClient.Client.PostAsJsonAsync(url,usr);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsAsync<ResponseModel<UserModel>>();

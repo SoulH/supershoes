@@ -64,11 +64,13 @@
 .icons {
     display: inline-flex;
     flex-direction: column;
+    background-color: whitesmoke;
 }
 
 .menu {
     display: inline-flex;
     flex-direction: column;
+    background-color: whitesmoke;
 }
 
 .navbar-item {
@@ -205,6 +207,10 @@
 
     .left > a {
         display: none;
+    }
+
+    .search > label, select {
+        display: none
     }
 
     #menu-toggle {
